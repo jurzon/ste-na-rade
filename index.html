@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ste na rade — lieková politika z prvej línie</title>
+<meta name="description" content="Názory lekárnika na liekovú politiku ako pás z pokladničnej tlačiarne. Prototyp.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Crect x=%223%22 y=%221%22 width=%2210%22 height=%2214%22 fill=%22%23f4f1ea%22/%3E%3Crect x=%225%22 y=%227%22 width=%226%22 height=%222%22 fill=%22%23c8322a%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styl.css">
+</head>
+<body class="na-uvode">
+
+<button id="len-fakty" class="roh" type="button" aria-haspopup="dialog">Len fakty</button>
+<button id="zvuk" class="roh roh-2" type="button" aria-pressed="true" title="Zvuk">zvuk: zap.</button>
+
+<!-- SCÉNA 0: lekáreň, okienko a poradové číslo -->
+<section id="uvod" aria-label="Úvod">
+  <div class="lekaren">
+    <div class="tabula" aria-hidden="true"><span class="kriz"></span><span class="tabula-text">LEKÁREŇ</span></div>
+
+    <div class="okno-ram">
+      <div class="displej" aria-live="polite"><span class="displej-cislo" id="displej-cislo">A&nbsp;000</span><span class="displej-okienko" id="displej-okienko">čakajte</span></div>
+      <div class="okno">
+        <div class="regaly" id="regaly" aria-hidden="true"></div>
+        <div class="sklo-odlesk" aria-hidden="true"></div>
+        <div class="mriezka" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <div class="pult-lekarne">
+      <div class="miska-vydaj" aria-hidden="true"></div>
+      <div class="automat">
+        <div class="automat-stitok">Vezmite si<br>poradové číslo</div>
+        <button id="zvoncek" class="automat-tlacidlo" type="button" aria-label="Vziať si poradové číslo a začať">
+          <span>A</span>
+        </button>
+        <div class="automat-strbina" aria-hidden="true"></div>
+        <div class="sem-pero" aria-hidden="true">
+          <span class="sem-text">začnite tu</span>
+          <svg viewBox="0 0 120 50"><path class="sem-sipka" d="M6 8 C 46 2, 86 6, 114 30"/><path class="sem-hrot" d="M98 30 L 115 31 L 110 15"/></svg>
+        </div>
+        <div class="poradovy-listok" id="poradovy-listok" aria-hidden="true">
+          <small>LEKÁREŇ</small><b>A 001</b><small>okienko 1</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="ste-na-rade" id="ste-na-rade">Vezmite si poradové číslo.</p>
+</section>
+
+<!-- TLAČIAREŇ + PÁS -->
+<main id="pult" hidden>
+  <div class="tlaciaren" aria-hidden="true"><div class="strbina"></div></div>
+
+  <div id="stol" class="stol">
+  <article id="pas" class="pas stara" aria-live="polite">
+    <!-- Scéna 1: účtenka (č. 010) -->
+    <div class="r stred tlmene">LEKÁREŇ ▒▒▒▒▒▒▒▒</div>
+    <div class="r stred tlmene">▒▒▒▒▒▒▒▒▒▒ ▒▒ · IČO ▒▒▒▒▒▒▒▒</div>
+    <div class="r ciara"></div>
+    <div class="r riadok"><span>Liek na cholesterol, 90 tbl</span><span>1,76</span></div>
+    <div class="r drobne">úhrada ZP 2,97</div>
+    <div class="r riadok"><span>Biologický liek, injekcia</span><span>0,00</span></div>
+    <div class="r drobne"><span id="dokaz1">úhrada ZP 1&nbsp;957,64</span></div>
+    <div class="r riadok tlmene"><span>zaokrúhlenie</span><span>−0,01</span></div>
+    <div class="r ciara"></div>
+    <div class="r velke"><span>SPOLU</span><span>1,75&nbsp;€</span></div>
+    <div class="r ciara bodky"></div>
+
+    <div class="r stieracie" id="stieracie">
+      <div class="pod rukou" aria-label="Dopísané perom: za vás zaplatila poisťovňa 1 960,61 eur">
+        <div class="ruka-1">za vás zaplatila poisťovňa:</div>
+        <div class="ruka-2">1&nbsp;960,61&nbsp;€</div>
+        <svg class="podciarknutie" viewBox="0 0 220 14" aria-hidden="true"><path d="M4 9 C 40 3, 80 12, 120 6 S 190 4, 216 8"/></svg>
+      </div>
+      <canvas id="vrstva" aria-hidden="true"></canvas>
+      <button id="odkryt" class="odkryt" type="button">alebo odkryť klávesnicou</button>
+    </div>
+
+    <div class="r po-odkryti stred tlmene drobne-pozn">↑ dopísané perom. Na doklade je to len v drobnom riadku „úhrada ZP“.</div>
+    <div class="trhanie" aria-hidden="true"></div>
+  </article>
+
+  <!-- Správna účtenka (návrh z č. 010) -->
+  <article id="pas2" class="pas novy" hidden>
+    <div class="r rukou odozva" id="odozva1"></div>
+    <div class="r stred maly cerveny">Takto by mohla vyzerať</div>
+    <div class="r stred tlmene">LEKÁREŇ ▒▒▒▒▒▒▒▒</div>
+    <div class="r ciara"></div>
+    <div class="r riadok"><span>Liek na cholesterol, 90 tbl</span></div>
+    <div class="r riadok"><span>Biologický liek, injekcia</span></div>
+    <div class="r ciara"></div>
+    <div class="r suma"><span>Hodnota liekov</span><b>1&nbsp;962,37&nbsp;€</b></div>
+    <div class="r suma hlavna"><span>Uhradila vaša poisťovňa</span><b>1&nbsp;960,61&nbsp;€</b></div>
+    <div class="r suma"><span>Váš doplatok</span><b>1,76&nbsp;€</b></div>
+    <div class="r ciara bodky"></div>
+    <div class="r stred">Vaše dnešné lieky z 99,9&nbsp;% zaplatilo verejné zdravotné poistenie. Odvody všetkých poistencov, aj vaše.</div>
+    <div class="r zdroj">Zdroj: skutočný doklad z lekárne, október 2026, anonymizovaný. Príspevok č. 10.</div>
+    <div class="r ciara bodky"></div>
+    <div class="r stred dalsi"><button class="dalsi-btn" id="na-scenu2" type="button">Ďalší, prosím ›</button></div>
+    <div class="trhanie" aria-hidden="true"></div>
+  </article>
+  </div>
+
+  <!-- SCÉNA 2: 1 cent za 5 centov (č. 001) -->
+  <div id="stol2" class="stol" hidden>
+  <article id="pas3" class="pas stara" aria-live="polite">
+    <div class="r stred tlmene">LEKÁREŇ ▒▒▒▒▒▒▒▒</div>
+    <div class="r ciara"></div>
+    <div class="r riadok"><span>Výživa na lekársky predpis</span><span>0,01</span></div>
+    <div class="r drobne">úhrada ZP 37,40</div>
+    <div class="r ciara"></div>
+    <div class="r velke"><span>DOPLATOK</span><span>0,01&nbsp;€</span></div>
+    <div class="r ciara bodky"></div>
+    <div class="r stred maly">platba v hotovosti</div>
+
+    <div class="r po-minci riadok"><span>zaokrúhlenie</span><span>+0,04</span></div>
+    <div class="r po-minci velke"><span>HOTOVOSŤ</span><span>0,05&nbsp;€</span></div>
+    <div class="r po-platbe riadok"><span>prijaté</span><span id="prijate">0,05</span></div>
+    <div class="r po-platbe riadok tlmene"><span>vrátené</span><span id="vratene">0,00</span></div>
+    <div class="r po-platbe rukou poznamka-pero">liek za 1 cent, zaplatené 5 centov</div>
+    <div class="r po-platbe stred dalsi"><button class="dalsi-btn" id="vynimka" type="button">Je to výnimka?</button></div>
+
+    <div class="r po-vynimke stred maly">všetky lieky s doplatkom v zozname</div>
+    <div class="r po-vynimke bodky-graf"><canvas id="bodky" role="img" aria-label="2 510 bodiek: 1 992 plných a 518 prázdnych"></canvas></div>
+    <div class="r po-vynimke stred legenda">● nekončí na 0 ani 5 centov &nbsp; ○ končí</div>
+    <div class="r po-vynimke stred obrovske-cierne"><span id="dokaz2">79&nbsp;%</span></div>
+    <div class="r po-vynimke stred">doplatkov sa v hotovosti nedá zaplatiť presne<br>(1&nbsp;992 z 2&nbsp;510 liekov).</div>
+    <div class="r po-vynimke stred tlmene">51 liekov má doplatok pod 10 centov.</div>
+    <div class="r po-vynimke zdroj">Zdroj: zoznam kategorizovaných liekov MZ SR k 1. 10. 2026, lieky na recept v lekárni. Bloček z lekárne, október 2026. Príspevok č. 1.</div>
+    <div class="trhanie" aria-hidden="true"></div>
+  </article>
+
+  <article id="pas4" class="pas novy" hidden>
+    <div class="r rukou odozva" id="odozva2"></div>
+    <div class="r stred maly cerveny">Takto by to mohlo byť</div>
+    <div class="r stred tlmene">LEKÁREŇ ▒▒▒▒▒▒▒▒</div>
+    <div class="r ciara"></div>
+    <div class="r riadok"><span>Výživa na lekársky predpis</span><span>0,00</span></div>
+    <div class="r ciara"></div>
+    <div class="r velke cerveny"><span>DOPLATOK</span><span>0,00&nbsp;€</span></div>
+    <div class="r ciara bodky"></div>
+    <div class="r navrh-riadok"><b>1.</b> Doplatok v zozname je vždy násobkom 5 centov.</div>
+    <div class="r navrh-riadok"><b>2.</b> Doplatok pod 0,10&nbsp;€ je 0&nbsp;€.</div>
+    <div class="r stred">Zaokrúhli sa raz, v zozname. Nie každý deň pri tisíckach pokladní. V hotovosti aj kartou rovnaká suma.</div>
+    <div class="r ciara bodky"></div>
+    <div class="r stred dalsi"><button class="dalsi-btn" id="na-scenu3" type="button">Ďalší, prosím ›</button></div>
+    <div class="trhanie" aria-hidden="true"></div>
+  </article>
+  </div>
+
+  <!-- SCÉNA 3: Tá istá tableta, dve ceny (č. 012) -->
+  <div id="stol3" class="stol" hidden>
+  <article id="pas5" class="pas stara" aria-live="polite">
+    <div class="r stred tlmene">LEKÁREŇ ▒▒▒▒▒▒▒▒</div>
+    <div class="r ciara"></div>
+    <div class="r riadok"><span>Jardiance 10 mg · 1 tableta</span></div>
+    <div class="r drobne">oficiálna cena bez DPH, vrátane prirážok</div>
+    <div class="r ciara"></div>
+    <div class="r velke"><span>SLOVENSKO</span><span>1,32&nbsp;€</span></div>
+    <div class="r ciara bodky"></div>
+
+    <div class="r po-hranici riadok"><span>Nemecko, rovnaká tableta</span><span>1,99</span></div>
+    <div class="r po-hranici rukou poznamka-pero">o 0,67 € viac za to isté</div>
+    <div class="r po-hranici ciara"></div>
+    <div class="r po-hranici stred maly">ale je 1,32 € skutočná cena?</div>
+    <div class="r po-hranici stred">Pri chorobe obličiek platí neverejná zmluva so zľavou.</div>
+    <div class="r po-hranici velke s-pruhom"><span>SKUTOČNÁ</span><button type="button" class="zaciernene" id="pruh" aria-label="Začiernená suma. Skúsiť odkryť.">&nbsp;</button></div>
+    <div class="r po-hranici stred tlmene drobne-pozn" id="pruh-pokyn">kliknite na čierny pruh</div>
+    <div class="r po-pruhu rukou poznamka-pero">Výška zľavy je v dokumentoch začiernená. Nevie ju pacient, lekárnik ani verejnosť.</div>
+    <div class="r po-pruhu zdroj">Zdroj: zoznam kategorizovaných liekov MZ SR k 1. 10. 2026 (90 tbl 124,88 € s 5 % DPH), DocMorris 15. 10. 2026 (100 tbl 236,43 € s 19 % DPH), rozhodnutie MZ SR R 9021. Príspevok č. 12.</div>
+    <div class="trhanie" aria-hidden="true"></div>
+  </article>
+
+  <article id="pas6" class="pas novy" hidden>
+    <div class="r rukou odozva" id="odozva3"></div>
+    <div class="r stred maly cerveny">Takto by to mohlo byť</div>
+    <div class="r stred tlmene">LEKÁREŇ ▒▒▒▒▒▒▒▒</div>
+    <div class="r ciara"></div>
+    <div class="r riadok"><span>Jardiance 10 mg · 1 tableta</span></div>
+    <div class="r ciara"></div>
+    <div class="r velke cerveny"><span>CENA</span><span>JEDNA&nbsp;PRE&nbsp;EÚ</span></div>
+    <div class="r ciara bodky"></div>
+    <div class="r navrh-riadok"><b>1.</b> Ceny liekov vyjednávať spoločne za celú EÚ, nie 27 tajných dohôd.</div>
+    <div class="r navrh-riadok"><b>2.</b> Kým sa štáty dohodnú: doma zverejniť ročný súhrn, koľko ušetrili všetky dôverné zmluvy spolu.</div>
+    <div class="r stred">Kupujúci so 450 miliónmi ľudí má inú vyjednávaciu silu ako Slovensko s piatimi miliónmi.</div>
+    <div class="r ciara bodky"></div>
+    <div class="r stred dalsi"><button class="dalsi-btn" id="na-scenu4" type="button">Ďalší, prosím ›</button></div>
+    <div class="trhanie" aria-hidden="true"></div>
+  </article>
+  </div>
+
+  <div id="hranica" class="platba hranica" hidden>
+    <p class="pokyn rukou" id="hranica-pokyn">Potiahnite tabletu cez hranicu.</p>
+    <div class="cena-tablety" id="cena-tab" aria-live="polite">1,32&nbsp;€</div>
+    <div class="trat" id="trat">
+      <span class="krajina vlavo">SLOVENSKO</span>
+      <span class="ciara-hranice" aria-hidden="true"></span>
+      <span class="krajina vpravo">NEMECKO</span>
+      <button class="tableta" id="tableta" type="button" aria-label="Tableta Jardiance. Šípkou doprava ju posuniete do Nemecka."></button>
+    </div>
+  </div>
+
+  <!-- SCÉNA 4: Liek v boxe (č. 013) -->
+  <div id="stol4" class="stol" hidden>
+  <article id="pas7" class="pas stara" aria-live="polite">
+    <div class="r stred tlmene">E-SHOP LEKÁRNE ▒▒▒▒▒▒</div>
+    <div class="r stred maly">objednávka</div>
+    <div class="r ciara"></div>
+    <div class="r riadok"><span>Paralen 500, 1 balenie</span></div>
+    <div class="r drobne">uchovávajte pri teplote do 25 °C</div>
+    <div class="r ciara"></div>
+    <div class="r riadok"><span>doprava</span><span>výdajný box</span></div>
+    <div class="r riadok tlmene"><span>uloženie v boxe</span><span>až 2 dni</span></div>
+    <div class="r ciara bodky"></div>
+
+    <div class="r po-lete stred maly">leto 2026</div>
+    <div class="r po-lete stred">Tretie najteplejšie leto od roku 1931.</div>
+    <div class="r po-lete riadok"><span>Hurbanovo, dni nad 30 °C</span><span>56</span></div>
+    <div class="r po-lete velke"><span>MAX.</span><span>42,2&nbsp;°C</span></div>
+    <div class="r po-lete drobne">6. 8. 2026, Dolné Plachtince, v tieni, rekord SR</div>
+    <div class="r po-lete ciara"></div>
+    <div class="r po-lete stred maly">záznam teploty</div>
+    <div class="r po-lete riadok"><span>v lekárni</span><span>každé 2 hodiny</span></div>
+    <div class="r po-lete drobne">kalibrovaný teplomer, záznamy 12 mesiacov</div>
+    <div class="r po-lete velke s-pruhom"><span>V BOXE</span><span id="dokaz4">—</span></div>
+    <div class="r po-lete zdroj">Zdroj: SHMÚ, zhodnotenie leta 2026; vyhláška 129/2012 Z. z. § 30; vyhláška 21/2012 Z. z. § 5; písomná informácia Paralen 500. Príspevok č. 13.</div>
+    <div class="trhanie" aria-hidden="true"></div>
+  </article>
+
+  <article id="pas8" class="pas novy" hidden>
+    <div class="r rukou odozva" id="odozva4"></div>
+    <div class="r stred maly cerveny">Takto by to mohlo byť</div>
+    <div class="r stred tlmene">E-SHOP LEKÁRNE ▒▒▒▒▒▒</div>
+    <div class="r ciara"></div>
+    <div class="r riadok"><span>Paralen 500, 1 balenie</span></div>
+    <div class="r drobne">uchovávajte pri teplote do 25 °C</div>
+    <div class="r ciara"></div>
+    <div class="r velke cerveny"><span>TEPLOTA</span><span>ZAZNAMENANÁ</span></div>
+    <div class="r ciara bodky"></div>
+    <div class="r navrh-riadok"><b>1.</b> Liek s teplotnou požiadavkou posielať len so záznamom teploty. Stačí jednorazový teplotný indikátor v zásielke.</div>
+    <div class="r navrh-riadok"><b>2.</b> Lieky do výdajných boxov neposielať. Doplniť to do vyhlášky.</div>
+    <div class="r navrh-riadok"><b>3.</b> Pri kontrole internetového výdaja kontrolovať aj prepravu, nielen lekáreň.</div>
+    <div class="r stred">Rovnaký liek, rovnaké pravidlá.</div>
+    <div class="r ciara bodky"></div>
+    <div class="r stred">Ďakujeme. Boli ste posledný v rade.</div>
+    <div class="r stred dalsi"><button class="dalsi-btn" id="na-recept" type="button">Váš recept ›</button></div>
+    <div class="trhanie" aria-hidden="true"></div>
+  </article>
+  </div>
+
+  <div id="leto" class="platba leto" hidden>
+    <p class="pokyn rukou" id="leto-pokyn">Podržte tlačidlo. Leto 2026 začína.</p>
+    <div class="leto-scena">
+      <div class="box" aria-hidden="true">
+        <div class="dvierka"></div><div class="dvierka"></div><div class="dvierka"></div>
+        <div class="dvierka otvorene"><span class="balenie">Paralen<br><small>do 25 °C</small></span></div>
+        <div class="dvierka"></div><div class="dvierka"></div>
+        <div class="box-stitok">VÝDAJNÝ BOX</div>
+      </div>
+      <div class="teplomer" aria-hidden="true">
+        <div class="stupnica"><span style="bottom:calc(25/45*100%)">25</span><span style="bottom:calc(40/45*100%)">40</span></div>
+        <div class="hranica-letaku" style="bottom:calc(25/45*100%)"><i>leták</i></div>
+        <div class="rtut" id="rtut"></div>
+      </div>
+    </div>
+    <div class="leto-udaje">
+      <div><small>vonku v tieni</small><b id="leto-teplota">18,0&nbsp;°C</b></div>
+      <div><small id="leto-mesiac">jún</small><b><span id="leto-dni">0 dní</span> nad 30&nbsp;°C</b></div>
+    </div>
+    <button class="podrzte" id="podrzte" type="button">podržte</button>
+  </div>
+
+  <!-- ZÁVER: váš recept -->
+  <div id="stol5" class="stol" hidden>
+  <article id="pas9" class="pas recept" aria-live="polite">
+    <div class="r stred maly">váš recept</div>
+    <div class="r stred tlmene drobne-pozn">Poskladaný z toho, ako ste hrali. Nikam sa neposiela.</div>
+    <div class="r ciara"></div>
+    <div class="r recept-obraz"><canvas id="plagat" width="1080" height="1350" role="img" aria-label="Váš recept: plagát z vašich pečiatok, mincí a lístkov"></canvas></div>
+    <div class="r ciara bodky"></div>
+    <div class="r stred dalsi"><button class="dalsi-btn" id="stiahni" type="button">Stiahnuť plagát (PNG)</button></div>
+    <div class="r stred drobne-pozn">Celé príspevky: <a href="https://www.linkedin.com/in/juraj-zonnenschein" target="_blank" rel="noopener">LinkedIn</a> · <a href="https://x.com/jurzon" target="_blank" rel="noopener">X</a></div>
+    <div class="r stred dalsi"><button class="dalsi-btn tichsie" id="znova" type="button">Ešte raz od začiatku</button></div>
+    <div class="trhanie" aria-hidden="true"></div>
+  </article>
+  </div>
+
+  <div id="platba" class="platba" hidden>
+    <p class="pokyn rukou" id="pokyn">Zaplaťte doplatok 0,01 €. Kliknite na mincu.</p>
+    <div class="mince" role="group" aria-label="Mince">
+      <button class="minca medena" data-c="1" type="button" aria-label="1 cent"><b>1</b><i>cent</i></button>
+      <button class="minca medena" data-c="2" type="button" aria-label="2 centy"><b>2</b><i>centy</i></button>
+      <button class="minca medena" data-c="5" type="button" aria-label="5 centov"><b>5</b><i>centov</i></button>
+      <button class="minca zlta" data-c="10" type="button" aria-label="10 centov"><b>10</b><i>centov</i></button>
+    </div>
+    <div class="miska" aria-live="polite"><span class="v-miske" id="v-miske"></span><span class="suma-misky" id="suma-misky">0,00&nbsp;€</span></div>
+  </div>
+</main>
+
+<!-- CHVÍĽA TICHA: reflektor, veta perom, pečiatka -->
+<div id="reflektor" class="reflektor" hidden aria-hidden="true"></div>
+<p id="ticho-veta" class="ticho-veta rukou" hidden></p>
+<div id="ticho-ovladanie" class="ticho-ovladanie" hidden>
+  <p>Kliknite na doklad a opečiatkujte ho.</p>
+  <button id="peciatkuj" type="button">opečiatkovať</button>
+</div>
+
+<!-- MEDZIOBRAZOVKA: otáznik a lístky s nápadmi -->
+<div id="medzi" class="medzi" hidden role="dialog" aria-modal="true" aria-labelledby="medzi-otazka">
+  <svg class="otaznik" viewBox="0 0 200 240" aria-hidden="true">
+    <path class="otaznik-tah" d="M58 78 C 52 30, 110 14, 138 42 C 166 70, 150 104, 118 120 C 98 130, 96 146, 98 168"/>
+    <path class="otaznik-bod" d="M97 204 c 3 -4, 8 -2, 6 3 c -2 4, -8 3, -6 -3"/>
+  </svg>
+  <p id="medzi-otazka" class="otazka rukou"></p>
+  <div class="listky" id="listky"></div>
+  <p class="medzi-pozn">Vyberte jeden lístok. Nikam sa neposiela, ostáva len vo vašom prehliadači.</p>
+</div>
+
+<!-- LEN FAKTY -->
+<dialog id="fakty" aria-label="Len fakty">
+  <form method="dialog"><button class="zavriet" aria-label="Zavrieť">×</button></form>
+  <h2>Len fakty</h2>
+  <h3>Účtenka má ukázať, čo zaplatila poisťovňa</h3>
+  <p>Pacient si odniesol lieky v hodnote 1&nbsp;962,37&nbsp;€ a zaplatil 1,75&nbsp;€. Poisťovňa uhradila 1&nbsp;960,61&nbsp;€ (99,9&nbsp;%). Na účtenke je najväčším písmom suma 1,75&nbsp;€.</p>
+  <p><b>Návrh:</b> doklad z lekárne bude mať tri riadky veľkým písmom: hodnota liekov, úhrada poisťovne, doplatok. Lekáreň tieto údaje pri výdaji má.</p>
+  <p class="tlmene">Zdroj: skutočný doklad z lekárne, október 2026, anonymizovaný.</p>
+  <h3>1 cent za 5 centov</h3>
+  <p>Na bločku z lekárne: doplatok za výživu na lekársky predpis 0,01&nbsp;€, zaokrúhlenie 0,04&nbsp;€, v hotovosti 0,05&nbsp;€. V zozname kategorizovaných liekov má 79&nbsp;% doplatkov (1&nbsp;992 z 2&nbsp;510) sumu, ktorá nekončí na 0 ani 5 centov, a 51 liekov má doplatok pod 10 centov.</p>
+  <p><b>Návrh:</b> doplatok v zozname je vždy násobkom 5 centov a doplatok pod 0,10&nbsp;€ je 0&nbsp;€. Zaokrúhli sa raz, v zozname, a v hotovosti aj kartou sa zaplatí rovnako.</p>
+  <p class="tlmene">Zdroj: zoznam kategorizovaných liekov MZ SR k 1. 10. 2026 (lieky na recept v lekárni).</p>
+  <h3>Tá istá tableta, dve ceny</h3>
+  <p>Jardiance 10 mg stojí na Slovensku oficiálne 1,32&nbsp;€ za tabletu a v Nemecku 1,99&nbsp;€ (bez DPH, vrátane prirážok distribúcie a lekárne). Pri chronickej chorobe obličiek platí na Slovensku neverejná zmluva so zľavou; jej výška je v dokumentoch začiernená.</p>
+  <p><b>Návrh:</b> ceny liekov vyjednávať spoločne za celú EÚ namiesto 27 tajných dohôd. Kým sa na tom štáty dohodnú, zverejňovať aspoň ročný súhrn, koľko ušetrili všetky dôverné zmluvy spolu.</p>
+  <p class="tlmene">Zdroj: zoznam kategorizovaných liekov MZ SR k 1. 10. 2026, DocMorris 15. 10. 2026, rozhodnutie MZ SR R 9021.</p>
+  <h3>Liek v boxe</h3>
+  <p>V letáku Paralenu stojí „Uchovávajte pri teplote do 25&nbsp;°C“. V lekárni teplotu stráži kalibrovaný teplomer so záznamom aspoň každé dve hodiny, záznamy sa uchovávajú 12 mesiacov. Ten istý liek z e-shopu môže vo výdajnom boxe čakať aj dva dni a teplotu v ňom nezapisuje nikto. Leto 2026 bolo podľa SHMÚ tretie najteplejšie od roku 1931; v Hurbanove bolo 56 dní nad 30&nbsp;°C a 6. 8. 2026 namerali v Dolných Plachtinciach 42,2&nbsp;°C v tieni, nový rekord SR.</p>
+  <p><b>Návrh:</b> liek s teplotnou požiadavkou posielať len so záznamom teploty (stačí jednorazový indikátor), lieky do výdajných boxov neposielať a doplniť to do vyhlášky, pri kontrole internetového výdaja kontrolovať aj prepravu.</p>
+  <p class="tlmene">Zdroj: SHMÚ, zhodnotenie leta 2026; vyhlášky 129/2012 Z. z. a 21/2012 Z. z.</p>
+</dialog>
+
+<script src="skript.js"></script>
+</body>
+</html>
