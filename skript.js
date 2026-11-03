@@ -253,7 +253,7 @@
       }
       zaplatene = true;
       document.querySelectorAll("#platba .mince .minca").forEach((x) => (x.disabled = true));
-      $("#pokyn").textContent = "Ďakujeme. Liek stál 1 cent.";
+      $("#pokyn").textContent = "Ďakujeme. Doplatok bol 1 cent.";
       $("#prijate").textContent = eur(vMiske);
       $("#vratene").textContent = eur(vMiske - POTREBNE);
       await cakaj(900);
@@ -417,7 +417,7 @@
 
     // 4. veta perom pod (alebo nad) dôkazom
     const v = $("#ticho-veta");
-    v.textContent = veta;
+    v.textContent = veta.replace(/([.?!]) /g, "$1\n"); // každá veta na novom riadku
     v.hidden = false;
     await cakaj(30); v.classList.add("on");
     await cakaj(1400);
@@ -628,7 +628,7 @@
       await cakaj(600);
       await chvilaTicha({
         pas: $("#pas7"), dokaz: $("#dokaz4"),
-        veta: "V lekárni sa stráži každý stupeň. Za jej dverami už nikto.",
+        veta: "V lekárni sa stráži každý stupeň. V boxe ho nemeria nikto.",
         peciatka: "NEMERANÉ", podpis: "výdajný box",
       });
       const volba = await opytaj("Ako by mohla byť preprava liekov bezpečnejšia?", [
@@ -787,12 +787,20 @@
       g.fillStyle = l ? PERO : TLMENE; g.font = `700 52px ${RUKA}`;
       g.fillText(!l ? "–" : zhoda ? "✓" : "?", W - 130, y + 6);
     });
-    // podpis perom
+    // legenda k fajke a otázniku
+    g.fillStyle = TLMENE; g.font = `20px ${MONO}`;
+    g.fillText("✓ váš lístok = môj návrh   ·   ? vybrali ste iný", 150, 1158);
+    // podpis perom: „my“ = lekárnik a návštevník
+    const n4 = navrhy.length;
+    const zhodaText = !zaznam.listky.length ? "Ste na rade."
+      : zhody === n4 ? "Zhodli sme sa vo všetkých štyroch."
+      : zhody === 0 ? "Tentoraz sme sa nezhodli. Skúste to znova."
+      : `Zhodli sme sa v ${zhody} zo ${n4}.`;
     g.fillStyle = PERO; g.font = `700 50px ${RUKA}`;
-    g.save(); g.translate(80, 1230); g.rotate(-0.025);
-    g.fillText(zaznam.listky.length ? `Zhodli ste sa v ${zhody} zo ${navrhy.length}.` : "Ste na rade.", 0, 0);
+    g.save(); g.translate(80, 1232); g.rotate(-0.025);
+    g.fillText(zhodaText, 0, 0);
     g.restore();
-    g.fillStyle = CERV; g.font = `700 22px ${MONO}`; g.fillText("NÁVRHY PODĽA PRÍSPEVKOV Č. 10, 1, 12 A 13", 80, 1290);
+    g.fillStyle = CERV; g.font = `700 22px ${MONO}`; g.fillText("NÁVRHY LEKÁRNIKA Z PRVEJ LÍNIE", 80, 1290);
     g.fillStyle = TLMENE; g.font = `20px ${MONO}`;
     const dnes = new Date();
     g.fillText(`x.com/jurzon · ${dnes.getDate()}. ${dnes.getMonth() + 1}. ${dnes.getFullYear()}`, 80, 1322);

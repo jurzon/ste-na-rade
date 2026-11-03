@@ -572,3 +572,7 @@ dialog h3 { font-size: 17px; margin: 0 0 6px; }
   .sem-text::after { content: " ↓"; }
 }
 @media (max-width: 600px) { .sem-pero { top: auto; bottom: 100%; margin: 0 0 6px; } }
+/* vyvážené zalomenie viet perom (bez osamoteného slova na konci) */
+.ticho-veta, .otazka, .odozva .odp, .pokyn { text-wrap: balance; }
+.ticho-veta { white-space: pre-line; }
+@media (min-width: 960px) { .ticho-veta { width: 360px; right: calc(50% + 230px); } }
