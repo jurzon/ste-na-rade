@@ -1,17 +1,23 @@
-/* „Ste na rade“ — prototyp: úvod, scény č. 010, 001, 012, 013 a záverečný recept.
+/* „Ste na rade“: úvod, scény č. 010, 001, 012, 013 a záverečný recept.
    Bez knižníc, bez cookies, bez sledovania. */
 (() => {
   "use strict";
   const $ = (s) => document.querySelector(s);
   const pokojne = matchMedia("(prefers-reduced-motion: reduce)").matches;
   // Záznam hry pre záverečný plagát. Len v pamäti, nikam sa neposiela.
-  const zaznam = { peciatky: [], listky: [], mince: [], pruhKliky: 0, pustil: 0 };
+  // listky sú podľa scény (0–3): pri vstupe odkazom na scénu sa predošlé vynechajú.
+  const zaznam = { scena: 0, peciatky: [], listky: [], mince: [], pruhKliky: 0, pustil: 0 };
 
   /* ---------- zvuk (WebAudio, spustí sa až po kliknutí) ---------- */
-  let ac = null, zvukZap = true;
-  const audio = () => (ac ??= new (window.AudioContext || window.webkitAudioContext)());
+  let ac = null, zvukZap = true, gesto = false;
+  ["pointerdown", "keydown"].forEach((u) => addEventListener(u, () => { gesto = true; }, { capture: true, once: true }));
+  const audio = () => {
+    ac ??= new (window.AudioContext || window.webkitAudioContext)();
+    if (ac.state === "suspended") ac.resume();
+    return ac;
+  };
   function zvoncek() {
-    if (!zvukZap) return;
+    if (!zvukZap || !gesto) return;
     const a = audio(), t = a.currentTime;
     [1318, 1976, 2637].forEach((f, i) => {
       const o = a.createOscillator(), g = a.createGain();
@@ -23,7 +29,7 @@
     });
   }
   function tlac(dlzka = 0.09) { // krátky šum termotlačiarne
-    if (!zvukZap) return;
+    if (!zvukZap || !gesto) return;
     const a = audio(), n = Math.floor(a.sampleRate * dlzka);
     const buf = a.createBuffer(1, n, a.sampleRate), d = buf.getChannelData(0);
     for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (0.5 + 0.5 * Math.sin(i / 38));
@@ -32,7 +38,7 @@
     s.buffer = buf; s.connect(f).connect(g).connect(a.destination); s.start();
   }
   function skrab() {
-    if (!zvukZap || Math.random() > 0.35) return;
+    if (!zvukZap || !gesto || Math.random() > 0.35) return;
     tlac(0.03);
   }
   $("#zvuk").addEventListener("click", (e) => {
@@ -57,7 +63,7 @@
 
   /* ---------- scéna 0 → 1 ---------- */
   function gong() { // vyvolávací systém: dvojtón
-    if (!zvukZap) return;
+    if (!zvukZap || !gesto) return;
     const a = audio(), t = a.currentTime;
     [[784, 0], [622, 0.38]].forEach(([f, d]) => {
       const o = a.createOscillator(), g = a.createGain();
@@ -107,12 +113,17 @@
     $("#pult").hidden = false;
     window.scrollTo(0, 0);
     await cakaj(300);
+    await spustScenu1();
+  });
+
+  async function spustScenu1() {
+    zaznam.scena = 0;
     const pas = $("#pas");
     const pred = [...pas.querySelectorAll(".r")].filter((r) => !r.classList.contains("po-odkryti"));
     await vytlac(pred);
     await new Promise((r) => setTimeout(r, 400)); // počkať na koniec rozbalenia riadku
     pripravStieranie();
-  });
+  }
 
   /* ---------- stieracia vrstva ---------- */
   let odkryte = false;
@@ -207,7 +218,7 @@
   /* ---------- scéna 2: 1 cent za 5 centov (č. 001) ---------- */
   const eur = (c) => (c / 100).toFixed(2).replace(".", ",");
   function cink() {
-    if (!zvukZap) return;
+    if (!zvukZap || !gesto) return;
     const a = audio(), t = a.currentTime;
     [3150, 4720].forEach((f, i) => {
       const o = a.createOscillator(), g = a.createGain();
@@ -222,11 +233,15 @@
   $("#na-scenu2").addEventListener("click", async (e) => {
     e.currentTarget.disabled = true;
     await dalsiZakaznik($("#stol"), $("#stol2"));
+    await spustScenu2();
+  });
+  async function spustScenu2() {
+    zaznam.scena = 1;
     await vytlac(tlacRiadkyBez($("#pas3"), "po-minci", "po-platbe", "po-vynimke"));
     const platba = $("#platba");
     platba.hidden = false;
     if (!pokojne) platba.scrollIntoView({ block: "end", behavior: "smooth" });
-  });
+  }
 
   let vMiske = 0, zaplatene = false;
   const POTREBNE = 5; // pokladňa chce 0,05 € v hotovosti
@@ -275,7 +290,7 @@
     await chvilaTicha({
       pas: $("#pas3"), dokaz: $("#dokaz2"),
       veta: "Takmer štyri z piatich doplatkov sa v hotovosti nedajú zaplatiť presne.",
-      peciatka: "NESEDÍ", podpis: "1 992 doplatkov",
+      peciatka: "NESEDÍ", podpis: "1 944 doplatkov",
     });
     const volba = await opytaj("Čo s doplatkom, ktorý sa nedá zaplatiť?", [
       { text: "Zaokrúhliť ho raz, už v zozname kategorizovaných liekov.", odpoved: "Presne tak. Raz, v zozname:" },
@@ -294,9 +309,9 @@
     await vytlac([...nova.querySelectorAll(".r")], 300);
   });
 
-  // 2 510 liekov s doplatkom: 1 992 plných (nekončí na 0/5 centov), 518 prázdnych
+  // 2 455 liekov s doplatkom: 1 944 plných (nekončí na 0/5 centov), 511 prázdnych
   async function kresliBodky() {
-    const SPOLU = 2510, PLNE = 1992, STLPCE = 50;
+    const SPOLU = 2455, PLNE = 1944, STLPCE = 50;
     const cv = $("#bodky"), ctx = cv.getContext("2d");
     const dpr = Math.max(1, window.devicePixelRatio || 1);
     const w = cv.parentElement.getBoundingClientRect().width;
@@ -334,7 +349,7 @@
       });
       listky.forEach((b, i) => b.addEventListener("click", async () => {
         listky.forEach((x) => (x.disabled = true));
-        zaznam.listky.push({ i, text: moznosti[i].text });
+        zaznam.listky[zaznam.scena] = { i, text: moznosti[i].text };
         listky.forEach((x) => x !== b && x.classList.add("iny"));
         // lístok vletí do štrbiny tlačiarne
         const ciel = $(".strbina").getBoundingClientRect(), r = b.getBoundingClientRect();
@@ -372,7 +387,7 @@
   /* ---------- chvíľa ticha: reflektor, krúžok perom, veta, pečiatka ----------
      Problém sa zastaví a návštevník ho sám opečiatkuje. Pečiatka ostane na doklade. */
   function buch() {
-    if (!zvukZap) return;
+    if (!zvukZap || !gesto) return;
     const a = audio(), t = a.currentTime;
     const o = a.createOscillator(), g = a.createGain();
     o.type = "sine"; o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(55, t + 0.18);
@@ -471,12 +486,16 @@
   $("#na-scenu3").addEventListener("click", async (e) => {
     e.currentTarget.disabled = true;
     await dalsiZakaznik($("#stol2"), $("#stol3"));
+    await spustScenu3();
+  });
+  async function spustScenu3() {
+    zaznam.scena = 2;
     await vytlac(tlacRiadkyBez($("#pas5"), "po-hranici", "po-pruhu"));
     const hr = $("#hranica");
     hr.hidden = false;
     if (!pokojne) hr.scrollIntoView({ block: "end", behavior: "smooth" });
     pripravHranicu();
-  });
+  }
 
   function pripravHranicu() {
     const trat = $("#trat"), tab = $("#tableta"), hr = $("#hranica");
@@ -565,12 +584,16 @@
   $("#na-scenu4").addEventListener("click", async (e) => {
     e.currentTarget.disabled = true;
     await dalsiZakaznik($("#stol3"), $("#stol4"));
+    await spustScenu4();
+  });
+  async function spustScenu4() {
+    zaznam.scena = 3;
     await vytlac(tlacRiadkyBez($("#pas7"), "po-lete"));
     const leto = $("#leto");
     leto.hidden = false;
     if (!pokojne) leto.scrollIntoView({ block: "end", behavior: "smooth" });
     pripravLeto();
-  });
+  }
 
   // Leto 2026 (SHMÚ): 56 dní nad 30 °C v Hurbanove, maximum 42,2 °C 6. 8. 2026.
   // Stúpanie teplomera je ilustrácia; overené sú len koncové čísla.
@@ -672,7 +695,8 @@
       setTimeout(() => URL.revokeObjectURL(a.href), 2000);
     }, "image/png");
   });
-  $("#znova").addEventListener("click", () => location.reload());
+  // bez #scény: „od začiatku“ znamená úvod aj po vstupe odkazom na scénu
+  $("#znova").addEventListener("click", () => location.replace(location.pathname));
 
   function kresliPlagat() {
     const cv = $("#plagat"), g = cv.getContext("2d"), W = 1080, H = 1350;
@@ -703,13 +727,13 @@
 
     // --- umelecká plocha 80..1000 × 210..770 ---
     const X0 = 80, Y0 = 210, AW = W - 160, AH = 560;
-    // 2 510 bodiek (1 992 plných) ako tichý podklad
+    // 2 455 bodiek (1 944 plných) ako tichý podklad
     const st = 50, kr = AW / st;
-    for (let i = 0; i < 2510; i++) {
+    for (let i = 0; i < 2455; i++) {
       const x = X0 + (i % st) * kr + kr / 2, y = Y0 + 40 + Math.floor(i / st) * kr * 0.95;
       if (y > Y0 + AH) break;
       g.beginPath(); g.arc(x, y, kr * 0.28, 0, Math.PI * 2);
-      if (i < 1992) { g.fillStyle = "rgba(27,26,24,.10)"; g.fill(); }
+      if (i < 1944) { g.fillStyle = "rgba(27,26,24,.10)"; g.fill(); }
       else { g.strokeStyle = "rgba(27,26,24,.16)"; g.lineWidth = 1.2; g.stroke(); }
     }
     // teplomer: výška = 42,2 °C, zlomy = koľkokrát návštevník pustil
@@ -791,11 +815,12 @@
     g.fillStyle = TLMENE; g.font = `20px ${MONO}`;
     g.fillText("✓ váš lístok = môj návrh   ·   ? vybrali ste iný", 150, 1158);
     // podpis perom: „my“ = lekárnik a návštevník
-    const n4 = navrhy.length;
-    const zhodaText = !zaznam.listky.length ? "Ste na rade."
-      : zhody === n4 ? "Zhodli sme sa vo všetkých štyroch."
+    const hrane = zaznam.listky.filter(Boolean).length;
+    const zhodaText = !hrane ? "Ste na rade."
       : zhody === 0 ? "Tentoraz sme sa nezhodli. Skúste to znova."
-      : `Zhodli sme sa v ${zhody} zo ${n4}.`;
+      : zhody === 4 ? "Zhodli sme sa vo všetkých štyroch."
+      : zhody === hrane ? "Zhodli sme sa."
+      : `Zhodli sme sa v ${zhody} ${hrane === 4 ? "zo" : "z"} ${hrane}.`;
     g.fillStyle = PERO; g.font = `700 50px ${RUKA}`;
     g.save(); g.translate(80, 1232); g.rotate(-0.025);
     g.fillText(zhodaText, 0, 0);
@@ -805,4 +830,22 @@
     const dnes = new Date();
     g.fillText(`x.com/jurzon · ${dnes.getDate()}. ${dnes.getMonth() + 1}. ${dnes.getFullYear()}`, 80, 1322);
   }
+
+  /* ---------- vstup odkazom na scénu (#cent, #box…): bez úvodu ---------- */
+  const SCENY = {
+    uctenka: ["#stol", spustScenu1],
+    cent: ["#stol2", spustScenu2],
+    tableta: ["#stol3", spustScenu3],
+    box: ["#stol4", spustScenu4],
+  };
+  const vstup = SCENY[location.hash.slice(1)];
+  if (vstup) {
+    $("#uvod").hidden = true;
+    document.body.classList.remove("na-uvode");
+    $("#pult").hidden = false;
+    $("#stol").hidden = true;
+    $(vstup[0]).hidden = false;
+    vstup[1]();
+  }
+  addEventListener("hashchange", () => location.reload());
 })();

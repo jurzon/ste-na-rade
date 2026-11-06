@@ -4,11 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ste na rade — lieková politika z prvej línie</title>
-<meta name="description" content="Názory lekárnika na liekovú politiku ako pás z pokladničnej tlačiarne. Prototyp.">
+<meta name="description" content="Interaktívna stránka lekárnika o liekovej politike: dnešný doklad, problém, ktorý na ňom nevidno, a návrh, ako to zlepšiť.">
+<meta name="author" content="Juraj Zonnenschein">
+<link rel="canonical" href="https://jurzon.github.io/ste-na-rade/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="sk_SK">
+<meta property="og:site_name" content="Ste na rade">
+<meta property="og:title" content="Ste na rade: lieková politika z prvej línie">
+<meta property="og:description" content="Interaktívna stránka lekárnika o liekovej politike: dnešný doklad, problém, ktorý na ňom nevidno, a návrh, ako to zlepšiť.">
+<meta property="og:url" content="https://jurzon.github.io/ste-na-rade/">
+<meta property="og:image" content="https://jurzon.github.io/ste-na-rade/karty/uvod.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ste na rade: dnešný doklad, problém a návrh, ako to zlepšiť">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Crect x=%223%22 y=%221%22 width=%2210%22 height=%2214%22 fill=%22%23f4f1ea%22/%3E%3Crect x=%225%22 y=%227%22 width=%226%22 height=%222%22 fill=%22%23c8322a%22/%3E%3C/svg%3E">
 <link rel="stylesheet" href="styl.css">
 </head>
 <body class="na-uvode">
+
+<a id="podpis" class="roh roh-podpis" href="https://www.linkedin.com/in/juraj-zonnenschein" target="_blank" rel="noopener">Juraj Zonnenschein · lekárnik</a>
 
 <button id="len-fakty" class="roh" type="button" aria-haspopup="dialog">Len fakty</button>
 <button id="zvuk" class="roh roh-2" type="button" aria-pressed="true" title="Zvuk">zvuk: zap.</button>
@@ -122,12 +137,12 @@
     <div class="r po-platbe stred dalsi"><button class="dalsi-btn" id="vynimka" type="button">Je to výnimka?</button></div>
 
     <div class="r po-vynimke stred maly">všetky lieky s doplatkom v zozname</div>
-    <div class="r po-vynimke bodky-graf"><canvas id="bodky" role="img" aria-label="2 510 bodiek: 1 992 plných a 518 prázdnych"></canvas></div>
+    <div class="r po-vynimke bodky-graf"><canvas id="bodky" role="img" aria-label="2 455 bodiek: 1 944 plných a 511 prázdnych"></canvas></div>
     <div class="r po-vynimke stred legenda">● nekončí na 0 ani 5 centov &nbsp; ○ končí</div>
     <div class="r po-vynimke stred obrovske-cierne"><span id="dokaz2">79&nbsp;%</span></div>
-    <div class="r po-vynimke stred">doplatkov sa v hotovosti nedá zaplatiť presne<br>(1&nbsp;992 z 2&nbsp;510 liekov).</div>
-    <div class="r po-vynimke stred tlmene">51 liekov má doplatok pod 10 centov.</div>
-    <div class="r po-vynimke zdroj">Zdroj: zoznam kategorizovaných liekov MZ SR k 1. 10. 2026, lieky na recept v lekárni. Bloček z lekárne, október 2026.</div>
+    <div class="r po-vynimke stred">doplatkov sa v hotovosti nedá zaplatiť presne<br>(1&nbsp;944 z 2&nbsp;455 liekov).</div>
+    <div class="r po-vynimke stred tlmene">48 liekov má doplatok pod 10 centov.</div>
+    <div class="r po-vynimke zdroj">Zdroj: zoznam kategorizovaných liekov MZ SR k 1. 11. 2026, lieky na recept v lekárni. Bloček z lekárne, október 2026.</div>
     <div class="trhanie" aria-hidden="true"></div>
   </article>
 
@@ -321,14 +336,15 @@
 <dialog id="fakty" aria-label="Len fakty">
   <form method="dialog"><button class="zavriet" aria-label="Zavrieť">×</button></form>
   <h2>Len fakty</h2>
+  <p class="tlmene">Autor: Juraj Zonnenschein, lekárnik. <a href="https://www.linkedin.com/in/juraj-zonnenschein" target="_blank" rel="noopener">LinkedIn</a> · <a href="https://x.com/jurzon" target="_blank" rel="noopener">X</a></p>
   <h3>Účtenka má ukázať, čo zaplatila poisťovňa</h3>
   <p>Pacient si odniesol lieky v hodnote 1&nbsp;962,37&nbsp;€ a zaplatil 1,75&nbsp;€. Poisťovňa uhradila 1&nbsp;960,61&nbsp;€ (99,9&nbsp;%). Na účtenke je najväčším písmom suma 1,75&nbsp;€.</p>
   <p><b>Návrh:</b> doklad z lekárne bude mať tri riadky veľkým písmom: hodnota liekov, úhrada poisťovne, doplatok. Lekáreň tieto údaje pri výdaji má.</p>
   <p class="tlmene">Zdroj: skutočný doklad z lekárne, október 2026, anonymizovaný.</p>
   <h3>1 cent za 5 centov</h3>
-  <p>Na bločku z lekárne: doplatok za výživu na lekársky predpis 0,01&nbsp;€, zaokrúhlenie 0,04&nbsp;€, v hotovosti 0,05&nbsp;€. V zozname kategorizovaných liekov má 79&nbsp;% doplatkov (1&nbsp;992 z 2&nbsp;510) sumu, ktorá nekončí na 0 ani 5 centov, a 51 liekov má doplatok pod 10 centov.</p>
+  <p>Na bločku z lekárne: doplatok za výživu na lekársky predpis 0,01&nbsp;€, zaokrúhlenie 0,04&nbsp;€, v hotovosti 0,05&nbsp;€. V zozname kategorizovaných liekov má 79&nbsp;% doplatkov (1&nbsp;944 z 2&nbsp;455) sumu, ktorá nekončí na 0 ani 5 centov, a 48 liekov má doplatok pod 10 centov.</p>
   <p><b>Návrh:</b> doplatok v zozname je vždy násobkom 5 centov a doplatok pod 0,10&nbsp;€ je 0&nbsp;€. Zaokrúhli sa raz, v zozname, a v hotovosti aj kartou sa zaplatí rovnako.</p>
-  <p class="tlmene">Zdroj: zoznam kategorizovaných liekov MZ SR k 1. 10. 2026 (lieky na recept v lekárni).</p>
+  <p class="tlmene">Zdroj: zoznam kategorizovaných liekov MZ SR k 1. 11. 2026 (lieky na recept v lekárni).</p>
   <h3>Tá istá tableta, dve ceny</h3>
   <p>Jardiance 10 mg stojí na Slovensku oficiálne 1,32&nbsp;€ za tabletu a v Nemecku 1,99&nbsp;€ (bez DPH, vrátane prirážok distribúcie a lekárne). Pri chronickej chorobe obličiek platí na Slovensku neverejná zmluva so zľavou; jej výška je v dokumentoch začiernená.</p>
   <p><b>Návrh:</b> ceny liekov vyjednávať spoločne za celú EÚ namiesto 27 tajných dohôd. Kým sa na tom štáty dohodnú, zverejňovať aspoň ročný súhrn, koľko ušetrili všetky dôverné zmluvy spolu.</p>

@@ -35,6 +35,7 @@ body { font-family: var(--mono); min-height: 100vh; overflow-x: hidden; }
   border: 1px solid #3a3733; border-radius: 3px; padding: 6px 10px; cursor: pointer;
 }
 .roh-2 { right: 120px; }
+.roh-podpis, body.na-uvode .roh-podpis { right: auto; left: 16px; border-color: transparent; text-decoration: none; }
 .roh:hover, .roh:focus-visible { color: var(--papier); border-color: var(--papier); outline: none; }
 
 /* ---------- scéna 0: lekáreň, okienko a poradové číslo ---------- */
@@ -211,6 +212,7 @@ body.na-uvode .roh:hover, body.na-uvode .roh:focus-visible { color: #1b1a18; bor
 
 @media (max-width: 600px) {
   .roh { top: auto; bottom: 14px; background: rgba(13,12,11,.85); }
+  .roh-podpis, body.na-uvode .roh-podpis { position: absolute; top: 4px; bottom: auto; left: 6px; padding: 2px 4px; font-size: 11px; background: none; }
 }
 
 /* ---------- stôl: stará a nová účtenka ---------- */
